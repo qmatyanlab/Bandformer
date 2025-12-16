@@ -1,0 +1,31 @@
+[project]
+name = "bandformer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "setuptools>=80.9.0",
+    "pyyaml>=6.0.3",
+    "ase>=3.26.0",
+    "ase-db-backends>=0.11.0",
+    "numpy>=2.3.5",
+    "pymatgen>=2025.10.7",
+    "torch==2.8",
+    "torch-geometric==2.7.0",
+    "pyg_lib",
+    "torch_scatter",
+    "torch_sparse",
+    "torch_cluster",
+    "torch_spline_conv",
+    "wandb>=0.23.0",
+]
+
+[tool.uv]
+find-links = ["https://data.pyg.org/whl/torch-2.8.0+cu126.html"]
+
+[tool.uv.extra-build-dependencies]
+torch-cluster = ["torch"]
+torch-scatter = ["torch"]
+torch-sparse = ["torch"]
+torch-spline-conv = ["torch"]

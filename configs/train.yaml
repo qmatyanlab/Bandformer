@@ -1,0 +1,41 @@
+# Logging & Evaluation
+eval_interval: 400      # Evaluate on validation set every N iterations
+log_interval: 10        # Print training metrics every N iterations
+eval_iters: 200          # Number of batches to use for evaluation (averaged)
+eval_only: False          # If True, only run evaluation and exit
+always_save_checkpoint: False  # If True, save checkpoint after every eval (not just best)
+
+# Wandb Logging
+wandb_log: True           # Enable/disable wandb logging
+wandb_project: 'bandformer_runs'  # Wandb project name
+wandb_run_name: 'test run'  # Wandb run name
+
+# Data
+dataset: 'nm-6-cleaned-maxlen-30.pt'  # Dataset filename (not used directly, train.pt/val.pt are loaded)
+gradient_accumulation_steps: 8  # Accumulate gradients over N micro-batches before optimizer step
+                                 # Effective batch size = batch_size * gradient_accumulation_steps * num_gpus
+                                 # With 4 GPUs: if gradient_accumulation_steps=4, each GPU does 1 step
+                                 # So effective batch = 16 * 4 * 4 = 256 samples per iteration
+batch_size: 16            # Micro-batch size per GPU (actual batch size per GPU)
+
+# Model Architecture
+n_layer: 6                # Number of transformer layers in encoder/decoder
+n_head: 6                 # Number of attention heads
+n_embd: 768               # Model embedding dimension (d_model)
+dropout: 0.0              # Dropout rate (0.0 for pretraining, 0.1+ for finetuning)
+
+# Optimizer (AdamW)
+learning_rate: 1e-4       # Maximum learning rate (after warmup, before decay)
+max_iters: 40000          # Total number of training iterations (100 epochs)
+                          # Calculated: 100 epochs * (24994 samples / 64 effective_batch) = 39050 iterations
+                          # Use calculate_epochs.py script to recalculate for different epoch counts
+weight_decay: 0.0         # L2 weight decay regularization
+beta2: 0.99               # Adam beta2 parameter (momentum for squared gradients)
+grad_clip: 1.0            # Gradient clipping threshold (0.0 to disable)
+
+# Learning Rate Schedule
+decay_lr: True            # Whether to use learning rate decay (cosine decay)
+warmup_iters: 2000           # Number of iterations for linear warmup (0 = no warmup)
+                          # During warmup: lr = learning_rate * (iter + 1) / (warmup_iters + 1)
+                          # After warmup: cosine decay from learning_rate to min_lr
+min_lr: 1e-5              # Minimum learning rate (for cosine decay)
