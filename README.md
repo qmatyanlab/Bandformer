@@ -66,10 +66,25 @@ We recommend using [uv](https://github.com/astral-sh/uv) for efficient and relia
 
 2.  **Install Dependencies**
 
-    Create the virtual environment and install all dependencies (including PyTorch and PyG) as defined in `pyproject.toml`:
+    The `pyproject.toml` is configured with `find-links` for CUDA 12.6 (`cu126`). If you have a different CUDA version, update the `find-links` URL in `pyproject.toml` before running `uv sync`:
+
+    ```toml
+    [tool.uv]
+    find-links = ["https://data.pyg.org/whl/torch-2.8.0+cu126.html"]
+    #                                                   ^^^^^ change to match your CUDA version
+    #                                                   e.g., cu121, cu124
+    ```
+
+    Then create the virtual environment and install all dependencies:
 
     ```bash
     uv sync
+    ```
+
+    If the download times out for large packages, increase the timeout:
+
+    ```bash
+    UV_HTTP_TIMEOUT=300 uv sync
     ```
 
     Activate the environment:
@@ -94,9 +109,9 @@ For users preferring Conda or standard Pip, follow these steps:
     First, install PyTorch (version 2.8 recommended):
 
     ```bash
-    pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu121
+    pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
     ```
-    *(Note: Adjust the CUDA version `cu121` based on your system configuration.)*
+    *(Note: Adjust the CUDA version `cu126` based on your system configuration.)*
 
     Then, install the remaining dependencies:
 
@@ -108,7 +123,7 @@ For users preferring Conda or standard Pip, follow these steps:
 
     ```bash
     pip install setuptools pyyaml ase ase-db-backends numpy pymatgen wandb
-    pip install torch-geometric==2.7.0 pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.8.0+cu121.html
+    pip install torch-geometric==2.7.0 pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.8.0+cu126.html
     ```
 
 ### Data Preparation
@@ -121,7 +136,11 @@ The raw data was obtained from Materials Project's repository at AWS Open Data P
 
 The model expects the dataset file `nm-6-cleaned-maxlen-30.pt` to be present in the `data/` directory.
 
-1.  **Download Data**: Download the dataset from [Figshare](https://doi.org/10.6084/m9.figshare.30502967) and place the file `nm-6-cleaned-maxlen-30.pt` into the `data/` folder.
+1.  **Download Data**: Download the dataset (~254 MB) from [Figshare](https://doi.org/10.6084/m9.figshare.30502967) into the `data/` folder:
+
+    ```bash
+    wget -O data/nm-6-cleaned-maxlen-30.pt https://ndownloader.figshare.com/files/59214011
+    ```
 
 2.  **Prepare Splits**: Run the preparation script to generate training and validation splits (`train.pt` and `val.pt`).
 
@@ -160,7 +179,7 @@ python train.py --batch_size 32 --compile False
 To run on multiple GPUs (e.g., 4 GPUs on a single node):
 
 ```bash
-torchrun --standalone --nproc_per_node=4 train.py --config=configs/train.yaml
+torchrun --standalone --nproc_per_node=4 train.py --config configs/train.yaml
 ```
 
 ## Acknowledgement

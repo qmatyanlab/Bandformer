@@ -67,3 +67,5 @@ class Bandformer(nn.Module):
         xr = self.mlp1(x).swapaxes(1, 2)
         xi = self.mlp2(x).swapaxes(1, 2)
         xi[:, :, 0] = 0
+
+        return xr, xi
